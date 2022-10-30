@@ -226,10 +226,11 @@ class NewsList extends StatelessWidget {
                       width: 70,
                       height: 70,
                       child: Image.network(
-                        filterArticles[i].urlToImage != null
-                            ? filterArticles[i].urlToImage
-                            : "",
-                        //"https://ichef.bbci.co.uk/news/1024/branded_news/238E/production/_127420190_guantanmobay.jpg",
+                        // filterArticles[i].urlToImage != null
+                        //     ? filterArticles[i].urlToImage
+                        //     : "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
+                        //Default Image
+                        "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             width: 60,
