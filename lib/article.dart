@@ -10,7 +10,6 @@ String articleToJson(Article data) => json.encode(data.toJson());
 
 class Article {
   Article({
-    this.id,
     this.author,
     this.title,
     this.description,
@@ -19,8 +18,6 @@ class Article {
     this.publishedAt,
     this.content,
   });
-
-  int id;
   String author;
   String title;
   String description;
@@ -30,7 +27,6 @@ class Article {
   String content;
 
   factory Article.fromJson(Map<String, dynamic> json) => Article(
-        id: json["id"],
         author: json["author"],
         title: json["title"],
         description: json["description"],
@@ -41,7 +37,6 @@ class Article {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
         "author": author,
         "title": title,
         "description": description,

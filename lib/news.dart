@@ -51,7 +51,7 @@ class _NewsState extends State<News> {
       _databaseHelper.initDatabase();
       var dio = Dio();
       var response = await dio.get(
-          "https://newsapi.org/v2/everything?q=tesla&from=2022-09-30&sortBy=publishedAt&apiKey=6a14e0eae2254c0e8eead37baab7ff57");
+          "https://newsapi.org/v2/everything?q=tesla&from=2022-10-05&sortBy=publishedAt&apiKey=6a14e0eae2254c0e8eead37baab7ff57");
 
       if (response.data['status'] == "ok") {
         List<Article> maps = response.data['articles']
@@ -62,15 +62,23 @@ class _NewsState extends State<News> {
         for (int i = 0; i < maps.length; i++) {
           _databaseHelper.insertArtical(maps[i]);
         }
-      }
-    }
-    // get All articles if data alredy present
 
-    articless = (await _databaseHelper.getArticle());
-    filterArticles = articless;
-    setState(() {
-      _isLoading = false;
-    });
+        articless = (await _databaseHelper.getArticle());
+        filterArticles = articless;
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    } else {
+      //get All articles if data alredy present
+
+      articless = (await _databaseHelper.getArticle());
+
+      filterArticles = articless;
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -208,100 +216,104 @@ class NewsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        shrinkWrap: true,
-        physics: ScrollPhysics(),
-        itemCount: filterArticles.length,
-        itemBuilder: (c, i) {
-          var dateString = new DateFormat("dd, MMM yyyy")
-              .format(filterArticles[i].publishedAt);
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: GestureDetector(
-                  child: ListTile(
-                    contentPadding: EdgeInsets.all(0),
-                    leading: Container(
-                      width: 70,
-                      height: 70,
-                      child: Image.network(
-                        // filterArticles[i].urlToImage != null
-                        //     ? filterArticles[i].urlToImage
-                        //     : "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
-                        //Default Image
-                        "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            width: 60,
-                            height: 40,
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle, color: Colors.grey),
-                            alignment: Alignment.center,
-                            child: Text(
-                              'Whoops!',
-                              style: TextStyle(fontSize: 10),
-                            ),
-                          );
-                        },
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loading) {
-                          if (loading == null) return child;
-                          return Container(
-                            height: 40,
-                            child: Center(
-                                child: CircularProgressIndicator(
-                              value: loading.expectedTotalBytes != null
-                                  ? loading.cumulativeBytesLoaded /
-                                      loading.expectedTotalBytes
-                                  : null,
-                            )),
-                          );
-                        },
+    return (filterArticles == null || filterArticles.length == 0)
+        ? Text("No News")
+        : ListView.builder(
+            shrinkWrap: true,
+            physics: ScrollPhysics(),
+            itemCount: filterArticles.length,
+            itemBuilder: (c, i) {
+              var dateString = new DateFormat("dd, MMM yyyy")
+                  .format(filterArticles[i].publishedAt);
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: GestureDetector(
+                      child: ListTile(
+                        contentPadding: EdgeInsets.all(0),
+                        leading: Container(
+                          width: 70,
+                          height: 70,
+                          child: Image.network(
+                            // filterArticles[i].urlToImage != null
+                            //     ? filterArticles[i].urlToImage
+                            //     : "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
+                            //Default Image
+                            "https://media.zenfs.com/en/la_times_articles_853/d9d24554a488e22e213af09779654071",
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 60,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.rectangle,
+                                    color: Colors.grey),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'Whoops!',
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              );
+                            },
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loading) {
+                              if (loading == null) return child;
+                              return Container(
+                                height: 40,
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  value: loading.expectedTotalBytes != null
+                                      ? loading.cumulativeBytesLoaded /
+                                          loading.expectedTotalBytes
+                                      : null,
+                                )),
+                              );
+                            },
+                          ),
+                        ),
+                        title: Text(
+                          filterArticles[i].title != null
+                              ? filterArticles[i].title
+                              : '',
+                          style: TextStyle(
+                            height: 1.4,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6.0),
+                          child: Text(
+                            dateString,
+                            style: TextStyle(
+                                fontFamily: "AvenirRegular",
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF989898)),
+                          ),
+                        ),
                       ),
-                    ),
-                    title: Text(
-                      filterArticles[i].title != null
-                          ? filterArticles[i].title
-                          : '',
-                      style: TextStyle(
-                        height: 1.4,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 6.0),
-                      child: Text(
-                        dateString,
-                        style: TextStyle(
-                            fontFamily: "AvenirRegular",
-                            fontWeight: FontWeight.w900,
-                            color: Color(0xFF989898)),
-                      ),
+                      onTap: () {
+                        FocusScopeNode currentFocus = FocusScope.of(context);
+
+                        if (!currentFocus.hasPrimaryFocus) {
+                          currentFocus.unfocus();
+                        }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  NewsContent(filterArticles[i])),
+                        );
+                      },
                     ),
                   ),
-                  onTap: () {
-                    FocusScopeNode currentFocus = FocusScope.of(context);
-
-                    if (!currentFocus.hasPrimaryFocus) {
-                      currentFocus.unfocus();
-                    }
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => NewsContent(filterArticles[i])),
-                    );
-                  },
-                ),
-              ),
-              Divider(
-                height: 1,
-                color: Colors.grey,
-              )
-            ],
-          );
-        });
+                  Divider(
+                    height: 1,
+                    color: Colors.grey,
+                  )
+                ],
+              );
+            });
   }
 }
 
